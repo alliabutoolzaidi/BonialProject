@@ -1,51 +1,90 @@
 <template>
-    <!-- Account Picklist -->
-    <lightning-card title ="Account Contact Datatable">
-    <lightning-combobox
-        name="accountPicker"
-        label="Select Account"
-        value={selectedAccountId}
-        options={accountOptions}
-        onchange={handleAccountChange}
-    ></lightning-combobox>
+    <lightning-card title="Account Contact Management">
+        <div class="slds-p-around_medium">
+            <!-- Account Picklist -->
+            <lightning-combobox
+                name="accountPicker"
+                label="Select Account"
+                value={selectedAccountId}
+                options={accountOptions}
+                onchange={handleAccountChange}
+                class="slds-m-bottom_medium"
+            ></lightning-combobox>
 
-    <!-- Contact Table -->
-    <template if:true={contacts}>
-        <lightning-datatable
-            data={contacts}
-            columns={columns}
-            key-field="Id"
-            onrowaction={handleRowAction}
-        ></lightning-datatable>
-    </template>
-
-    <!-- Modal for Contact Edit -->
-    <template if:true={isModalOpen}>
-        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
-            <div class="slds-modal__container">
-                <!-- Modal/Overlay -->
-                <header class="slds-modal__header">
-                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
-                        <lightning-icon icon-name="utility:close" size="small" alternative-text="close" class="slds-button__icon slds-button__icon_large"></lightning-icon>
-                        <span class="slds-assistive-text">Close</span>
-                    </button>
-                    <h2 class="slds-text-heading_medium">Edit Contact</h2>
-                </header>
-                <div class="slds-modal__content slds-p-around_medium">
-                    <!-- Display Contact fields to edit here (e.g., First Name, Last Name) -->
-                    <lightning-input label="First Name" value={selectedContact.FirstName} onchange={handleContactFieldChange} data-id="FirstName"></lightning-input>
-                    <lightning-input label="Last Name" value={selectedContact.LastName} onchange={handleContactFieldChange} data-id="LastName"></lightning-input>
-                    <lightning-input label="Email" value={selectedContact.Email} onchange={handleContactFieldChange} data-id="Email"></lightning-input>
-                    <lightning-input label="MobilePhone" value={selectedContact.MobilePhone} onchange={handleContactFieldChange} data-id="MobilePhone"></lightning-input>
-                    <!-- Add more fields as necessary -->
+            <!-- Loader -->
+            <template if:true={isLoading}>
+                <div class="slds-align_absolute-center slds-m-vertical_medium">
+                    <lightning-spinner alternative-text="Loading Contacts..." size="medium"></lightning-spinner>
                 </div>
-                <footer class="slds-modal__footer">
-                    <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
-                    <lightning-button variant="brand" label="Save" onclick={saveContact}></lightning-button>
-                </footer>
-            </div>
-        </section>
-        <div class="slds-backdrop slds-backdrop_open"></div>
-    </template>
+            </template>
+
+            <!-- Contact Table -->
+            <template if:true={hasContacts}>
+                <lightning-datatable
+                    data={contacts}
+                    columns={columns}
+                    key-field="Id"
+                    onrowaction={handleRowAction}
+                    class="slds-m-top_medium"
+                ></lightning-datatable>
+            </template>
+
+            <!-- No Contacts Message -->
+            <template if:false={hasContacts}>
+                <div class="slds-text-align_center slds-m-vertical_large">
+                    <p class="slds-text-color_default slds-text-heading_small">
+                         No contacts found for this account.
+                    </p>
+                </div>
+            </template>
+        </div>
+
+        <!-- Modal for Contact Edit -->
+        <template if:true={isModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal Header -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                            title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" size="small" alternative-text="Close"
+                                class="slds-button__icon slds-button__icon_large"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium">Edit Contact</h2>
+                    </header>
+
+                    <!-- Modal Content -->
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label="First Name" value={selectedContact.FirstName}
+                                    onchange={handleContactFieldChange} data-id="FirstName"></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label="Last Name" value={selectedContact.LastName}
+                                    onchange={handleContactFieldChange} data-id="LastName"></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label="Email" value={selectedContact.Email}
+                                    onchange={handleContactFieldChange} data-id="Email"></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2">
+                                <lightning-input label="Mobile Phone" value={selectedContact.MobilePhone}
+                                    onchange={handleContactFieldChange} data-id="MobilePhone"></lightning-input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="neutral" label="Cancel" onclick={closeModal}></lightning-button>
+                        <lightning-button variant="brand" label="Save" onclick={saveContact}
+                            class="slds-m-left_small"></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
     </lightning-card>
 </template>

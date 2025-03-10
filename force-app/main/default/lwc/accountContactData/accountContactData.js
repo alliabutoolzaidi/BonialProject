@@ -2,7 +2,8 @@ import { LightningElement, track, wire } from 'lwc';
 import getAccounts from '@salesforce/apex/AccountContactController.getAccounts';
 import getContactsByAccountId from '@salesforce/apex/AccountContactController.getContactsByAccountId';
 import { updateRecord } from 'lightning/uiRecordApi';
-import { refreshApex } from '@salesforce/apex'; // Import refreshApex
+import { refreshApex } from '@salesforce/apex';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class AccountContactPicker extends LightningElement {
     @track accountOptions = [];
@@ -10,7 +11,7 @@ export default class AccountContactPicker extends LightningElement {
     @track contacts = [];
     @track isModalOpen = false;
     @track selectedContact = {};
-    wiredContactsResult; // Store the wired result for refreshApex
+    wiredContactsResult; 
 
     columns = [
         { label: 'First Name', fieldName: 'FirstName' },
@@ -44,7 +45,7 @@ export default class AccountContactPicker extends LightningElement {
     // Wire Contacts (Updated)
     @wire(getContactsByAccountId, { accountId: '$selectedAccountId' })
     wiredContacts(result) {
-        this.wiredContactsResult = result; // Store wired result for refreshApex
+        this.wiredContactsResult = result;
         if (result.data) {
             console.log('Contacts fetched for Account:', result.data);
             this.contacts = result.data;
@@ -52,6 +53,10 @@ export default class AccountContactPicker extends LightningElement {
             console.error('Error fetching contacts:', result.error);
         }
     }
+
+    get hasContacts() {
+    return this.contacts && this.contacts.length > 0;
+}
 
     // Handle Account Selection
     handleAccountChange(event) {
@@ -66,7 +71,7 @@ export default class AccountContactPicker extends LightningElement {
             console.log('Edit button clicked for Contact ID:', contactId);
             this.selectedContact = this.contacts.find(contact => contact.Id === contactId);
             console.log('Selected Contact:', this.selectedContact);
-            this.isModalOpen = true; // This opens the modal
+            this.isModalOpen = true; 
         }
     }
 
@@ -100,13 +105,24 @@ export default class AccountContactPicker extends LightningElement {
         updateRecord(recordInput)
             .then(() => {
                 console.log('Contact updated successfully!');
-                this.isModalOpen = false; // Close modal
-
-                // 🔄 Refresh contacts from Apex
+                this.isModalOpen = false; 
                 return refreshApex(this.wiredContactsResult);
             })
-            .catch(error => {
-                console.error('Error saving contact:', error);
-            });
+            .then(() => {
+            this.showToast('Success', 'Contact updated successfully!', 'success');
+        })
+        .catch(error => {
+            console.error('Error saving contact:', error);
+            this.showToast('Error', 'Failed to update contact.', 'error');
+        });
+    }
+
+    showToast(title, message, variant) {
+        const event = new ShowToastEvent({
+            title: title,
+            message: message,
+            variant: variant
+        });
+        this.dispatchEvent(event);
     }
 }
