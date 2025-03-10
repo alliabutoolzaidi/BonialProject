@@ -71,7 +71,7 @@ export default class AccountContactPicker extends LightningElement {
             console.log('Edit button clicked for Contact ID:', contactId);
             this.selectedContact = this.contacts.find(contact => contact.Id === contactId);
             console.log('Selected Contact:', this.selectedContact);
-            this.isModalOpen = true; 
+            this.isModalOpen = true; // This opens the modal
         }
     }
 

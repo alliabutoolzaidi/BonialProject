@@ -2,7 +2,14 @@
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
         <members>AccountContactController</members>
+        <members>AccountContactController_Test</members>
+         <members>PreventMultipleOpportunitiesHandler</members>
+        <members>PreventMultipleOpportunitiesHandlerTest</members>
         <name>ApexClass</name>
+    </types>
+    <types>
+        <members>PreventMultipleOpportunities</members>
+        <name>ApexTrigger</name>
     </types>
     <types>
         <members>accountContactData</members>
